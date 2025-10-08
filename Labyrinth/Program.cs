@@ -1,2 +1,12 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿const string lab = """
+                   +--+--------+
+                   |  /        |
+                   |  +--+--+  |
+                   |     |k    |
+                   +--+  |  +--+
+                      |k       |
+                   +  +-------/|
+                   |           |
+                   +-----------+
+                   """;
+Labyrinth.Labyrinth labyrinth = new Labyrinth.Labyrinth(lab);
