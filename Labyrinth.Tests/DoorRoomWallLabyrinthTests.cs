@@ -8,25 +8,24 @@ namespace Labyrinth.Tests
     public class DoorTests
     {
         [Fact]
-        public void Door_Default_IsClosed_And_Pass_Throws_NotImplemented()
+        public void Door_Default_IsClosed_And_Pass_Throws_InvalidOperation()
         {
             var key = new Key(Guid.NewGuid());
             var door = new Door(key);
 
             Assert.False(door.IsTraversable);
-            Assert.Throws<NotImplementedException>(() => door.Pass());
+            Assert.Throws<InvalidOperationException>(() => door.Pass());
         }
 
         [Fact]
-        public void Door_Close_WithRightKey_Then_Pass_Throws_NotImplemented_InCurrentImplementation()
+        public void Door_Close_WithRightKey_Then_Pass_Throws_InvalidOperation()
         {
             var key = new Key(Guid.NewGuid());
             var door = new Door(key);
 
-            door.CloseDoor(key);
-
+            door.Close(key);
             Assert.False(door.IsTraversable);
-            Assert.Throws<NotImplementedException>(() => door.Pass());
+            Assert.Throws<InvalidOperationException>(() => door.Pass());
         }
 
         [Fact]
@@ -36,23 +35,34 @@ namespace Labyrinth.Tests
             var wrong = new Key(Guid.NewGuid());
             var door = new Door(key);
 
-            door.CloseDoor(key);
+            door.Close(key);
             Assert.False(door.IsTraversable);
 
-            door.OpenDoor(wrong);
+            door.Open(wrong);
             Assert.False(door.IsTraversable);
+        }
+
+        [Fact]
+        public void Door_Open_WithRightKey_AllowsPass()
+        {
+            var key = new Key(Guid.NewGuid());
+            var door = new Door(key);
+
+            door.Open(key);
+            Assert.True(door.IsTraversable);
+            var ex = Record.Exception(() => door.Pass());
+            Assert.Null(ex);
         }
     }
 
     public class RoomTests
     {
         [Fact]
-        public void Room_IsAlwaysTraversable_PassDoesNotThrow()
+        public void Room_IsTraversable_But_Pass_Throws_NotImplemented_In_Current_Impl()
         {
             var room = new Room(null);
             Assert.True(room.IsTraversable);
-            var ex = Record.Exception(() => room.Pass());
-            Assert.Null(ex);
+            Assert.Throws<NotImplementedException>(() => room.Pass());
         }
 
         [Fact]
@@ -69,13 +79,11 @@ namespace Labyrinth.Tests
     public class WallTests
     {
         [Fact]
-        public void Wall_IsNotTraversable_PassDoesNotThrow_InCurrentImplementation()
+        public void Wall_IsNotTraversable_And_Pass_Throws_NotImplemented_In_Current_Impl()
         {
             var wall = new Wall();
             Assert.False(wall.IsTraversable);
-
-            var ex = Record.Exception(() => wall.Pass());
-            Assert.Null(ex);
+            Assert.Throws<NotImplementedException>(() => wall.Pass());
         }
     }
 }
