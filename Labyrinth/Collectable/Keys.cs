@@ -4,7 +4,11 @@
 /// Objet collectable représentant une clé du labyrinthe.
 /// </summary>
 /// <param name="guid">Identifiant unique de la clé.</param>
-public class Key(Guid guid) : ICollectable
+public class Key : ICollectable
 {
-    public Guid Guid { get; set; } = guid;
+    public Guid Id { get; }
+
+    public Key(Guid id) => Id = id;
+
+    public override string ToString() => $"Key({Id})";
 }

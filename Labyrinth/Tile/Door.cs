@@ -5,36 +5,26 @@ namespace Labyrinth.Tile;
 /// <summary>
 /// Tuile représentant une porte. Traversable uniquement lorsqu'elle est ouverte.
 /// </summary>
-public class Door : Tile
+public class Door(Key requiredKey) : Tile
 {
+    private readonly Key _requiredKey = requiredKey;
+
+    public bool IsOpened { get; private set; }
+
     public override bool IsTraversable => IsOpened;
-    public Key Key { get; }
-    public bool IsOpened { get; private set; } = false;
-
-    public override void Pass()
-    {
-        if (!IsTraversable)
-            throw new InvalidOperationException("La porte est fermée : vous ne pouvez pas passer.");
-    }
-
-    public Door(Key key)
-    {
-        Key = key;
-    }
-
-    public Door(Guid keyId, bool isOpened = false)
-    {
-        Key = new Key(keyId);
-        IsOpened = isOpened;
-    }
 
     public void Open(Key key)
     {
-        if (key.Guid == Key.Guid) IsOpened = true;
+        if (key.Id != _requiredKey.Id)
+            throw new InvalidOperationException("Cette clé ne correspond pas à cette porte !");
+        IsOpened = true;
     }
 
-    public void Close(Key key)
+    public void Close() => IsOpened = false;
+
+    public override void Pass()
     {
-        if (key.Guid == Key.Guid) IsOpened = false;
+        if (!IsOpened)
+            throw new InvalidOperationException("Impossible de traverser une porte fermée !");
     }
 }

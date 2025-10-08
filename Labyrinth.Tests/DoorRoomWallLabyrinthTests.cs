@@ -18,40 +18,29 @@ namespace Labyrinth.Tests
         }
 
         [Fact]
-        public void Door_Close_WithRightKey_Then_Pass_Throws_InvalidOperation()
-        {
-            var key = new Key(Guid.NewGuid());
-            var door = new Door(key);
-
-            door.Close(key);
-            Assert.False(door.IsTraversable);
-            Assert.Throws<InvalidOperationException>(() => door.Pass());
-        }
-
-        [Fact]
-        public void Door_Open_WithWrongKey_DoesNotChangeState_WhenClosed()
-        {
-            var key = new Key(Guid.NewGuid());
-            var wrong = new Key(Guid.NewGuid());
-            var door = new Door(key);
-
-            door.Close(key);
-            Assert.False(door.IsTraversable);
-
-            door.Open(wrong);
-            Assert.False(door.IsTraversable);
-        }
-
-        [Fact]
-        public void Door_Open_WithRightKey_AllowsPass()
+        public void Door_Open_WithRightKey_AllowsPass_Then_Close_BlocksAgain()
         {
             var key = new Key(Guid.NewGuid());
             var door = new Door(key);
 
             door.Open(key);
             Assert.True(door.IsTraversable);
-            var ex = Record.Exception(() => door.Pass());
-            Assert.Null(ex);
+            Assert.Null(Record.Exception(() => door.Pass()));
+
+            door.Close();
+            Assert.False(door.IsTraversable);
+            Assert.Throws<InvalidOperationException>(() => door.Pass());
+        }
+
+        [Fact]
+        public void Door_Open_WithWrongKey_Throws_And_StaysClosed()
+        {
+            var key   = new Key(Guid.NewGuid());
+            var wrong = new Key(Guid.NewGuid());
+            var door  = new Door(key);
+
+            Assert.Throws<InvalidOperationException>(() => door.Open(wrong));
+            Assert.False(door.IsTraversable);
         }
     }
 
