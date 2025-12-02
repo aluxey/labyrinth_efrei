@@ -11,7 +11,7 @@ namespace Labyrinth
         /// </summary>
         /// <param name="ascii_map">A multiline string with '+', '-' or '|' for walls, '/' for doors, 'k' for key locations and x for starting position.</param>
         /// <exception cref="ArgumentException">Thrown when string argument reveals inconsistent map sizes or characters with no starting position.</exception>
-        /// <exception cref="NotSupportedException">Thrown for multiple doors (resp. key locations) before key locations (resp. doors).</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the map contains mismatched numbers of doors and key locations.</exception>
         public Labyrinth(string ascii_map)
         {
             Build.AsciiParser parser = new();
