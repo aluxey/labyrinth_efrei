@@ -27,16 +27,17 @@ namespace Labyrinth.Tiles
         /// Opens the door with the provided key.
         /// </summary>
         /// <param name="keySource">Inventory containing the key to open the door.</param>
+        /// <param name="nth">Index of the key to try in the source inventory.</param>
         /// <returns>True if the key opens the door, false otherwise.</returns>
         /// <remarks>The key is removed from the inventory only if it opens the door.</remarks>
         /// <exception cref="InvalidOperationException">The door is already opened (check with <see cref="IsOpened"/>).</exception>"
-        public bool Open(Inventory keySource)
+        public bool Open(Inventory keySource, int nth = 0)
         {
             if (IsOpened)
             {
                 throw new InvalidOperationException("Door is already unlocked.");
             }
-            LocalInventory.MoveItemFrom(keySource);
+            LocalInventory.MoveItemFrom(keySource, nth);
             if (LocalInventory.Items.First() != _key)
             {
                 keySource.MoveItemFrom(LocalInventory);

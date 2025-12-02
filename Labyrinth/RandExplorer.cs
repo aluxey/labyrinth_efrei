@@ -10,7 +10,7 @@ namespace Labyrinth
     {
         private readonly ICrawler _crawler = crawler;
         private readonly IEnumRandomizer<Actions> _rnd = rnd;
-        
+
         public enum Actions
         {
             TurnLeft,
@@ -25,22 +25,18 @@ namespace Labyrinth
             for( ; n > 0 && _crawler.FacingTile is not Outside; n--)
             {
                 EventHandler<CrawlingEventArgs>? changeEvent;
+                TryOpenFacingDoor(bag);
 
                 if (_crawler.FacingTile.IsTraversable
                     && _rnd.Next() == Actions.Walk)
                 {
-                    _crawler.Walk().SwapItems(bag);
+                    CollectInventory(bag, _crawler.Walk());
                     changeEvent = PositionChanged;
                 }
                 else
                 {
                     _crawler.Direction.TurnLeft();
                     changeEvent = DirectionChanged;
-                }
-                if (_crawler.FacingTile is Door door && door.IsLocked
-                    && bag.HasItems && bag.ItemTypes.First() == typeof(Key))
-                {
-                    door.Open(bag);
                 }
                 changeEvent?.Invoke(this, new CrawlingEventArgs(_crawler));
             }
@@ -50,6 +46,71 @@ namespace Labyrinth
         public event EventHandler<CrawlingEventArgs>? PositionChanged;
 
         public event EventHandler<CrawlingEventArgs>? DirectionChanged;
+
+        private static void CollectInventory(MyInventory bag, Inventory source)
+        {
+            while (source.HasItems)
+            {
+                bag.MoveItemFrom(source);
+            }
+        }
+
+        private void TryOpenFacingDoor(MyInventory bag)
+        {
+            if (_crawler.FacingTile is not Door door || !door.IsLocked)
+            {
+                return;
+            }
+
+            var keys = bag.Items.OfType<Key>().ToList();
+            foreach (var key in keys)
+            {
+                if (!door.IsLocked)
+                {
+                    break;
+                }
+
+                var keyIndex = IndexOf(bag, key);
+                if (keyIndex < 0)
+                {
+                    continue;
+                }
+
+                var opened = door.Open(bag, keyIndex);
+                if (opened)
+                {
+                    return;
+                }
+
+                MoveKeyToBack(bag, key);
+            }
+        }
+
+        private static void MoveKeyToBack(MyInventory bag, ICollectable key)
+        {
+            var keyIndex = IndexOf(bag, key);
+            if (keyIndex < 0)
+            {
+                return;
+            }
+            var temp = new MyInventory();
+            temp.MoveItemFrom(bag, keyIndex);
+            bag.MoveItemFrom(temp);
+        }
+
+        private static int IndexOf(MyInventory bag, ICollectable target)
+        {
+            var index = 0;
+            foreach (var item in bag.Items)
+            {
+                if (ReferenceEquals(item, target))
+                {
+                    return index;
+                }
+                index++;
+            }
+            return -1;
+        }
     }
 
 }

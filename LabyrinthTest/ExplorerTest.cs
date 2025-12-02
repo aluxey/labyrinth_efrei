@@ -305,4 +305,31 @@ public class ExplorerTest
         Assert.That(events.PositionChangedCount , Is.EqualTo(4));
         Assert.That(events.LastArgs, Is.EqualTo((3, 2, Direction.East)));
     }
+
+    [Test]
+    public void GetOutKeepsAllItemsAndTriesEveryKeyOnDoors()
+    {
+        var test = NewExplorerFor("""
+            +---+
+            | / |
+            |  /|
+            | k |
+            | k |
+            | x |
+            +---+
+            """,
+            out var events,
+            Actions.Walk,
+            Actions.Walk,
+            Actions.Walk,
+            Actions.Walk
+        );
+
+        var left = test.GetOut(5);
+
+        Assert.That(left, Is.EqualTo(0));
+        Assert.That(events.DirectionChangedCount, Is.EqualTo(1));
+        Assert.That(events.PositionChangedCount , Is.EqualTo(4));
+        Assert.That(events.LastArgs, Is.EqualTo((2, 1, Direction.West)));
+    }
 }
